@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox,filedialog
 import time,random,math
+import base64
 root=tk.Tk()
 root.title("rsa加密")
 e=0
@@ -91,7 +92,7 @@ def encrypt():
         messagebox.showerror("错误","请先生成密钥！")
         return
     starttime=time.time()
-    result=''
+    result=[]
     plaintext=plain.get(1.0,'end')[:-1]
     plaintext_encoded=plaintext.encode(encoding='GB2312')
     plaintext=''
@@ -109,11 +110,11 @@ def encrypt():
         bin_chunk_result=bin(int_chunk_result)[2:]
         bin_chunk_result=addzeros(bin_chunk_result,256+8)#为了加密中文或者文件什么的这里256位不够
         for j in range(0,len(bin_chunk_result),8):
-            result+=chr(int('0b'+bin_chunk_result[j:j+8],2))
+            result.append(int('0b'+bin_chunk_result[j:j+8],2))
     endtime=time.time()
     time_elapsed.set("加密时间："+str(endtime-starttime)[:6]+"秒")
     cipher.delete(1.0,'end')
-    cipher.insert(1.0,result)
+    cipher.insert(1.0,base64.b64encode(bytes(result)).decode("ascii"))
 
 def decrypt():
     if n==0:
@@ -121,12 +122,12 @@ def decrypt():
         return
     starttime=time.time()
     result=[]
-    ciphertext=cipher.get(1.0,'end')[:-1]
+    ciphertext=base64.b64decode(cipher.get(1.0,'end')[:-1].encode("ascii"))
     for i in range(0,len(ciphertext),33):
         text_chunk=ciphertext[i:i+33]
         bin_chunk=""
         for char in text_chunk:
-            bin_chunk+=addzeros(bin(ord(char))[2:],8)
+            bin_chunk+=addzeros(bin(char)[2:],8)
         int_chunk=int('0b'+bin_chunk,2)
         int_chunk_result=fastExpMod(int_chunk,d,n)
         bin_chunk_result=bin(int_chunk_result)[2:]
