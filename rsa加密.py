@@ -6,7 +6,6 @@ root.title("rsa加密")
 e=0
 d=0
 n=0
-root.configure(bg='#001F3F')
 
 '''函数部分'''
 #生成加密用的e，d和n
